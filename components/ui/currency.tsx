@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-const formatter = new Intl.NumberFormat('en-US', {
+const formatter = new Intl.NumberFormat('en-IN', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'INR',
 });
+
 
 interface CurrencyProps {
   value?: string | number;
