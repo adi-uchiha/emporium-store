@@ -59,9 +59,9 @@ const Summary = () => {
     var options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
       name: "Aditya Subhash Shelke", // @ts-ignore
-      currency: data.currency, // @ts-ignore
-      amount: data.amount, // @ts-ignore
-      order_id: data.id,
+      currency: data.data.currency, // @ts-ignore 
+      amount: data.data.amount, // @ts-ignore
+      order_id: data.data.id,
       description: "Thankyou for your test donation",
       image: "https://manuarora.in/logo.png",
       handler: function (response : any) {  
