@@ -9,6 +9,12 @@ import Currency from "@/components/ui/currency";
 import useCart from "@/hooks/use-cart";
 import { toast } from "react-hot-toast";
 
+interface ApiResponse {
+  currency: string;
+  amount: number;
+  // Add other properties as needed
+}
+
 const Summary = () => {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
@@ -38,7 +44,59 @@ const Summary = () => {
     window.location = response.data.url;
   }
 
+  const onCheckoutWithRazorPay = async () => {
+    setLoading(true)
+    const res = await initializeRazorpay();
+    if (!res) {
+      alert("Razorpay SDK Failed to load");
+      return;
+    }
+    // Make API call to the serverless API
+    const data = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkoutrazorpay`, {
+      productIds: items.map((item) => item.id)
+    });
+    console.log(data);
+    var options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
+      name: "Aditya Subhash Shelke", // @ts-ignore
+      currency: data.currency, // @ts-ignore
+      amount: data.amount, // @ts-ignore
+      order_id: data.id,
+      description: "Thankyou for your test donation",
+      image: "https://manuarora.in/logo.png",
+      handler: function (response : any) {  
+        // Validate payment at server - using webhooks is a better idea.
+        alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature);
+      },
+      prefill: {
+        name: "Manu Arora",
+        email: "manuarorawork@gmail.com",
+        contact: "9999999999",
+      },
+    };
+// @ts-ignore
+  const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  }
+  const initializeRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
   const [loading, setLoading] = useState(false)
+
+  
 
   return ( 
     <div
@@ -53,17 +111,12 @@ const Summary = () => {
          <Currency value={totalPrice} />
         </div>
       </div>
-      <Button onClick={onCheckout} disabled={items.length === 0} className="w-full mt-6">
-        {loading ? (
-          <button disabled type="button" className=" px-5 mr-2 text-base font-bold text-gray-900 bg-transparent hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-transparent inline-flex items-center">
-          <svg aria-hidden="true" role="status" className="inline w-4 h-4 mr-3 text-gray-200 animate-spin dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="#1C64F2"/>
-          </svg>
-          Loading...
-      </button>
-        )
-        : "Checkout"}
+      <Button onClick={onCheckout} disabled={items.length === 0 || loading} className="w-full mt-6">
+        Checkout with Stripe
+      </Button>
+
+      <Button onClick={onCheckoutWithRazorPay} disabled={items.length === 0 || loading} className="w-full mt-6">
+        Checkout with Razorpay
       </Button>
     </div>
   );
