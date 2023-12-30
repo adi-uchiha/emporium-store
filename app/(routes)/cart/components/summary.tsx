@@ -58,22 +58,24 @@ const Summary = () => {
     console.log(data);
     var options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY, // Enter the Key ID generated from the Dashboard
-      name: "Aditya Subhash Shelke", // @ts-ignore
+      name: "Aditya Shelke", // @ts-ignore
       currency: data.data.currency, // @ts-ignore 
       amount: data.data.amount, // @ts-ignore
       order_id: data.data.id,
-      description: "Thankyou for your test donation",
-      image: "https://manuarora.in/logo.png",
+      description: "Thankyou",
+      image: "/merchant.svg",
       handler: function (response : any) {  
         // Validate payment at server - using webhooks is a better idea.
         alert(response.razorpay_payment_id);
         alert(response.razorpay_order_id);
         alert(response.razorpay_signature);
+        toast.success('Payment completed.');
+        removeAll();
       },
       prefill: {
-        name: "Manu Arora",
-        email: "manuarorawork@gmail.com",
-        contact: "9999999999",
+        name: "Aditya Shelke",
+        email: "contact.aditya.dev@gmail.com",
+        contact: "7499695286",
       },
     };
 // @ts-ignore
