@@ -19,8 +19,8 @@ function Demo() {
       <div className='flex justify-center pt-16'>
         <div className='text-6xl'>Welcome to Emporium</div>
       </div>
-      <div className='w-80 lg:w-4/5 lg:max-w-4xl mx-auto text-center pt-12 flex flex-col'>
-        <span className='text-red-500'>Admin login</span> 
+      <div className='w-80 lg:w-4/5 lg:max-w-4xl mx-auto text-center pt-12 flex flex-col text-lg'>
+        <span className='text-red-500 font-extrabold'>Admin login</span> 
         <span>Email: contact.aditya.dev@gmail.com</span>
         <span>Password: Emporium@temp</span>
       </div>
